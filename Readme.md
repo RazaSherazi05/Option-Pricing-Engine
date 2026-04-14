@@ -1,6 +1,6 @@
 OPTION PRICING ENGINE (Python)
-
-This project implements a full quantitative finance pricing system.
+Purpose:
+To demonstrate practical understanding of derivative pricing and risk modelling.
 
 It includes:
 
@@ -18,5 +18,10 @@ Tools used:
 - NumPy
 - Matplotlib
 
-Purpose:
-To demonstrate practical understanding of derivative pricing and risk modelling.
+
+How to run:
+1. Install dependencies:
+   pip install numpy matplotlib
+
+2. Run:
+   python main.py
