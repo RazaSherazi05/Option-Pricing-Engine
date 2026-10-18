@@ -10,5 +10,7 @@ def monte_carlo_call(S, K, r, T, sigma, simulations=10000):
     payoff = np.maximum(ST - K, 0)
 
     price = np.exp(-r * T) * np.mean(payoff)
-
-    return price
+    
+    se = np.exp(-r * T) * np.std(payoff, ddof=1) / np.sqrt(simulations)
+ 
+    return price, se
