@@ -24,3 +24,12 @@ def implied_volatility(S, K, r, T, market_price, tol=1e-5):
         sigma = sigma - diff * 0.1
 
     return sigma
+
+    sigma_new = sigma - diff / vega_call(S, K, r, T, sigma)
+ 
+        if sigma_new <= 1e-6:  # keep sigma positive
+            sigma_new = sigma / 2
+ 
+        sigma = min(sigma_new, 5.0)  # cap to avoid overshooting
+ 
+    return sigma
