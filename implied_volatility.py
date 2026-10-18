@@ -1,35 +1,28 @@
 import math
-
-def black_scholes_call(S, K, r, T, sigma):
-    d1 = (math.log(S / K) + (r + 0.5 * sigma**2) * T) / (sigma * math.sqrt(T))
-    d2 = d1 - sigma * math.sqrt(T)
-
-    N = lambda x: 0.5 * (1 + math.erf(x / math.sqrt(2)))
-
-    return S * N(d1) - K * math.exp(-r * T) * N(d2)
+from black_scholes import black_scholes_call
+from greeks import vega_call
 
 
-def implied_volatility(S, K, r, T, market_price, tol=1e-5):
+def implied_volatility(S, K, r, T, market_price, tol=1e-8, max_iter=100):
+    # No-arbitrage bounds for a European call: max(S - K*e^(-rT), 0) < C < S
+    lower = max(S - K * math.exp(-r * T), 0.0)
+    if not (lower < market_price < S):
+        raise ValueError("Market price outside no-arbitrage bounds")
+
     sigma = 0.2  # initial guess
 
-    for i in range(100):
-        price = black_scholes_call(S, K, r, T, sigma)
-
-        diff = price - market_price
+    for _ in range(max_iter):
+        diff = black_scholes_call(S, K, r, T, sigma) - market_price
 
         if abs(diff) < tol:
             return sigma
 
-        # Newton-style approximation
-        sigma = sigma - diff * 0.1
+        # Newton-Raphson step: sigma_new = sigma - f(sigma) / f'(sigma), with f' = Vega
+        sigma_new = sigma - diff / vega_call(S, K, r, T, sigma)
 
-    return sigma
-
-    sigma_new = sigma - diff / vega_call(S, K, r, T, sigma)
- 
         if sigma_new <= 1e-6:  # keep sigma positive
             sigma_new = sigma / 2
- 
+
         sigma = min(sigma_new, 5.0)  # cap to avoid overshooting
- 
+
     return sigma
